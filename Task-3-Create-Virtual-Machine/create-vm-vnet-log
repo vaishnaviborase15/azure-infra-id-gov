@@ -1,0 +1,983 @@
+azureuser [ ~ ]$ az login
+Cloud Shell is automatically authenticated under the initial account signed-in with. Run 'az login' only if you need to use a different account
+To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code NCWHANRXN to authenticate.
+
+Retrieving tenants and subscriptions for the selection...
+
+[Tenant and subscription selection]
+
+No     Subscription name    Subscription ID                       Tenant
+-----  -------------------  ------------------------------------  -------------------------
+[1] *  Azure for Students   78b45807-4c0f-42c8-a888-49751e831f0a  Shirpur Education Society
+
+The default is marked with an *; the default tenant is 'Shirpur Education Society' and subscription is 'Azure for Students' (78b45807-4c0f-42c8-a888-49751e831f0a).
+
+Select a subscription and tenant (Type a number or Enter for no changes): 
+
+Tenant: Shirpur Education Society
+Subscription: Azure for Students (78b45807-4c0f-42c8-a888-49751e831f0a)
+
+[Announcements]
+With the new Azure CLI login experience, you can select the subscription you want to use more easily. Learn more about it and its configuration at https://go.microsoft.com/fwlink/?linkid=2271236
+
+If you encounter any problem, please open an issue at https://aka.ms/azclibug
+
+[Warning] The login output has been updated. Please be aware that it no longer displays the full list of available subscriptions by default.
+
+azureuser [ ~ ]$ az group create \
+  --name MyResourceGroup \
+  --location eastus
+{
+  "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup",
+  "location": "eastus",
+  "managedBy": null,
+  "name": "MyResourceGroup",
+  "properties": {
+    "provisioningState": "Succeeded"
+  },
+  "tags": null,
+  "type": "Microsoft.Resources/resourceGroups"
+}
+azureuser [ ~ ]$ az network vnet create \
+  --resource-group MyResourceGroup \
+  --name MyVNet \
+  --address-prefix 10.0.0.0/16 \
+  --subnet-name MySubnet \
+  --subnet-prefix 10.0.1.0/24
+{
+  "newVNet": {
+    "addressSpace": {
+      "addressPrefixes": [
+        "10.0.0.0/16"
+      ]
+    },
+    "enableDdosProtection": false,
+    "etag": "W/\"f448d92a-6b1f-4f91-96b0-0b59647b39ba\"",
+    "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup/providers/Microsoft.Network/virtualNetworks/MyVNet",
+    "location": "eastus",
+    "name": "MyVNet",
+    "privateEndpointVNetPolicies": "Disabled",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "MyResourceGroup",
+    "resourceGuid": "11aabe97-5e31-493d-b4fd-c80689e07ded",
+    "subnets": [
+      {
+        "addressPrefix": "10.0.1.0/24",
+        "delegations": [],
+        "etag": "W/\"f448d92a-6b1f-4f91-96b0-0b59647b39ba\"",
+        "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup/providers/Microsoft.Network/virtualNetworks/MyVNet/subnets/MySubnet",
+        "name": "MySubnet",
+        "privateEndpointNetworkPolicies": "Disabled",
+        "privateLinkServiceNetworkPolicies": "Enabled",
+        "provisioningState": "Succeeded",
+        "resourceGroup": "MyResourceGroup",
+        "type": "Microsoft.Network/virtualNetworks/subnets"
+      }
+    ],
+    "type": "Microsoft.Network/virtualNetworks",
+    "virtualNetworkPeerings": []
+  }
+}
+azureuser [ ~ ]$ az network nsg create \
+  --resource-group MyResourceGroup \
+  --name MyNSG
+{
+  "NewNSG": {
+    "defaultSecurityRules": [
+      {
+        "access": "Allow",
+        "description": "Allow inbound traffic from all VMs in VNET",
+        "destinationAddressPrefix": "VirtualNetwork",
+        "destinationAddressPrefixes": [],
+        "destinationPortRange": "*",
+        "destinationPortRanges": [],
+        "direction": "Inbound",
+        "etag": "W/\"7b555c93-c558-4869-96c9-1db787073e78\"",
+        "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkSecurityGroups/MyNSG/defaultSecurityRules/AllowVnetInBound",
+        "name": "AllowVnetInBound",
+        "priority": 65000,
+        "protocol": "*",
+        "provisioningState": "Succeeded",
+        "resourceGroup": "MyResourceGroup",
+        "sourceAddressPrefix": "VirtualNetwork",
+        "sourceAddressPrefixes": [],
+        "sourcePortRange": "*",
+        "sourcePortRanges": [],
+        "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+      },
+      {
+        "access": "Allow",
+        "description": "Allow inbound traffic from azure load balancer",
+        "destinationAddressPrefix": "*",
+        "destinationAddressPrefixes": [],
+        "destinationPortRange": "*",
+        "destinationPortRanges": [],
+        "direction": "Inbound",
+        "etag": "W/\"7b555c93-c558-4869-96c9-1db787073e78\"",
+        "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkSecurityGroups/MyNSG/defaultSecurityRules/AllowAzureLoadBalancerInBound",
+        "name": "AllowAzureLoadBalancerInBound",
+        "priority": 65001,
+        "protocol": "*",
+        "provisioningState": "Succeeded",
+        "resourceGroup": "MyResourceGroup",
+        "sourceAddressPrefix": "AzureLoadBalancer",
+        "sourceAddressPrefixes": [],
+        "sourcePortRange": "*",
+        "sourcePortRanges": [],
+        "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+      },
+      {
+        "access": "Deny",
+        "description": "Deny all inbound traffic",
+        "destinationAddressPrefix": "*",
+        "destinationAddressPrefixes": [],
+        "destinationPortRange": "*",
+        "destinationPortRanges": [],
+        "direction": "Inbound",
+        "etag": "W/\"7b555c93-c558-4869-96c9-1db787073e78\"",
+        "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkSecurityGroups/MyNSG/defaultSecurityRules/DenyAllInBound",
+        "name": "DenyAllInBound",
+        "priority": 65500,
+        "protocol": "*",
+        "provisioningState": "Succeeded",
+        "resourceGroup": "MyResourceGroup",
+        "sourceAddressPrefix": "*",
+        "sourceAddressPrefixes": [],
+        "sourcePortRange": "*",
+        "sourcePortRanges": [],
+        "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+      },
+      {
+        "access": "Allow",
+        "description": "Allow outbound traffic from all VMs to all VMs in VNET",
+        "destinationAddressPrefix": "VirtualNetwork",
+        "destinationAddressPrefixes": [],
+        "destinationPortRange": "*",
+        "destinationPortRanges": [],
+        "direction": "Outbound",
+        "etag": "W/\"7b555c93-c558-4869-96c9-1db787073e78\"",
+        "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkSecurityGroups/MyNSG/defaultSecurityRules/AllowVnetOutBound",
+        "name": "AllowVnetOutBound",
+        "priority": 65000,
+        "protocol": "*",
+        "provisioningState": "Succeeded",
+        "resourceGroup": "MyResourceGroup",
+        "sourceAddressPrefix": "VirtualNetwork",
+        "sourceAddressPrefixes": [],
+        "sourcePortRange": "*",
+        "sourcePortRanges": [],
+        "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+      },
+      {
+        "access": "Allow",
+        "description": "Allow outbound traffic from all VMs to Internet",
+        "destinationAddressPrefix": "Internet",
+        "destinationAddressPrefixes": [],
+        "destinationPortRange": "*",
+        "destinationPortRanges": [],
+        "direction": "Outbound",
+        "etag": "W/\"7b555c93-c558-4869-96c9-1db787073e78\"",
+        "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkSecurityGroups/MyNSG/defaultSecurityRules/AllowInternetOutBound",
+        "name": "AllowInternetOutBound",
+        "priority": 65001,
+        "protocol": "*",
+        "provisioningState": "Succeeded",
+        "resourceGroup": "MyResourceGroup",
+        "sourceAddressPrefix": "*",
+        "sourceAddressPrefixes": [],
+        "sourcePortRange": "*",
+        "sourcePortRanges": [],
+        "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+      },
+      {
+        "access": "Deny",
+        "description": "Deny all outbound traffic",
+        "destinationAddressPrefix": "*",
+        "destinationAddressPrefixes": [],
+        "destinationPortRange": "*",
+        "destinationPortRanges": [],
+        "direction": "Outbound",
+        "etag": "W/\"7b555c93-c558-4869-96c9-1db787073e78\"",
+        "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkSecurityGroups/MyNSG/defaultSecurityRules/DenyAllOutBound",
+        "name": "DenyAllOutBound",
+        "priority": 65500,
+        "protocol": "*",
+        "provisioningState": "Succeeded",
+        "resourceGroup": "MyResourceGroup",
+        "sourceAddressPrefix": "*",
+        "sourceAddressPrefixes": [],
+        "sourcePortRange": "*",
+        "sourcePortRanges": [],
+        "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+      }
+    ],
+    "etag": "W/\"7b555c93-c558-4869-96c9-1db787073e78\"",
+    "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkSecurityGroups/MyNSG",
+    "location": "eastus",
+    "name": "MyNSG",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "MyResourceGroup",
+    "resourceGuid": "82b4ba80-9584-4e99-8c91-aa7375122ba3",
+    "securityRules": [],
+    "type": "Microsoft.Network/networkSecurityGroups"
+  }
+}
+azureuser [ ~ ]$ az network nsg rule create \
+  --resource-group MyResourceGroup \
+  --nsg-name MyNSG \
+  --name AllowSSH \
+  --protocol Tcp \
+  --direction Inbound \
+  --priority 1000 \
+  --source-address-prefixes '*' \
+  --source-port-ranges '*' \
+  --destination-address-prefixes '*' \
+  --destination-port-ranges 22 \
+  --access Allow
+{
+  "access": "Allow",
+  "destinationAddressPrefix": "*",
+  "destinationAddressPrefixes": [],
+  "destinationPortRange": "22",
+  "destinationPortRanges": [],
+  "direction": "Inbound",
+  "etag": "W/\"b7bfed3d-1dfc-4908-a9d1-324d71dbfe4d\"",
+  "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkSecurityGroups/MyNSG/securityRules/AllowSSH",
+  "name": "AllowSSH",
+  "priority": 1000,
+  "protocol": "Tcp",
+  "provisioningState": "Succeeded",
+  "resourceGroup": "MyResourceGroup",
+  "sourceAddressPrefix": "*",
+  "sourceAddressPrefixes": [],
+  "sourcePortRange": "*",
+  "sourcePortRanges": [],
+  "type": "Microsoft.Network/networkSecurityGroups/securityRules"
+}
+azureuser [ ~ ]$ az network public-ip create \
+  --resource-group MyResourceGroup \
+  --name MyPublicIP
+[Coming breaking change] In the coming release, the default behavior will be changed as follows when sku is Standard and zone is not provided: For zonal regions, you will get a zone-redundant IP indicated by zones:["1","2","3"]; For non-zonal regions, you will get a non zone-redundant IP indicated by zones:null.
+{
+  "publicIp": {
+    "ddosSettings": {
+      "protectionMode": "VirtualNetworkInherited"
+    },
+    "etag": "W/\"e62a4b9a-69c9-43c4-b416-b1ab89943672\"",
+    "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup/providers/Microsoft.Network/publicIPAddresses/MyPublicIP",
+    "idleTimeoutInMinutes": 4,
+    "ipAddress": "172.178.36.203",
+    "ipTags": [],
+    "location": "eastus",
+    "name": "MyPublicIP",
+    "provisioningState": "Succeeded",
+    "publicIPAddressVersion": "IPv4",
+    "publicIPAllocationMethod": "Static",
+    "resourceGroup": "MyResourceGroup",
+    "resourceGuid": "d1f2c8c6-d425-43c0-8d7a-30dee6231525",
+    "sku": {
+      "name": "Standard",
+      "tier": "Regional"
+    },
+    "type": "Microsoft.Network/publicIPAddresses"
+  }
+}
+azureuser [ ~ ]$ az network nic create \
+  --resource-group MyResourceGroup \
+  --name MyNIC \
+  --vnet-name MyVNet \
+  --subnet MySubnet \
+  --network-security-group MyNSG \
+  --public-ip-address MyPublicIP
+{
+  "NewNIC": {
+    "auxiliaryMode": "None",
+    "auxiliarySku": "None",
+    "disableTcpStateTracking": false,
+    "dnsSettings": {
+      "appliedDnsServers": [],
+      "dnsServers": [],
+      "internalDomainNameSuffix": "s45kuejrly4utnh3zadityd33f.bx.internal.cloudapp.net"
+    },
+    "enableAcceleratedNetworking": false,
+    "enableIPForwarding": false,
+    "etag": "W/\"19ebd5e0-55d9-4159-badd-bdbf91018ea8\"",
+    "hostedWorkloads": [],
+    "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkInterfaces/MyNIC",
+    "ipConfigurations": [
+      {
+        "etag": "W/\"19ebd5e0-55d9-4159-badd-bdbf91018ea8\"",
+        "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkInterfaces/MyNIC/ipConfigurations/ipconfig1",
+        "name": "ipconfig1",
+        "primary": true,
+        "privateIPAddress": "10.0.1.4",
+        "privateIPAddressVersion": "IPv4",
+        "privateIPAllocationMethod": "Dynamic",
+        "provisioningState": "Succeeded",
+        "publicIPAddress": {
+          "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup/providers/Microsoft.Network/publicIPAddresses/MyPublicIP",
+          "resourceGroup": "MyResourceGroup"
+        },
+        "resourceGroup": "MyResourceGroup",
+        "subnet": {
+          "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup/providers/Microsoft.Network/virtualNetworks/MyVNet/subnets/MySubnet",
+          "resourceGroup": "MyResourceGroup"
+        },
+        "type": "Microsoft.Network/networkInterfaces/ipConfigurations"
+      }
+    ],
+    "location": "eastus",
+    "name": "MyNIC",
+    "networkSecurityGroup": {
+      "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup/providers/Microsoft.Network/networkSecurityGroups/MyNSG",
+      "resourceGroup": "MyResourceGroup"
+    },
+    "nicType": "Standard",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "MyResourceGroup",
+    "resourceGuid": "50e1bf64-5e24-4026-ac42-7b84cf756704",
+    "tapConfigurations": [],
+    "type": "Microsoft.Network/networkInterfaces",
+    "vnetEncryptionSupported": false
+  }
+}
+azureuser [ ~ ]$ az vm create \
+  --resource-group MyResourceGroup \
+  --name MyVM \
+  --nics MyNIC \
+  --image UbuntuLTS \
+  --admin-username azureuser \
+  --generate-ssh-keys
+Invalid image "UbuntuLTS". Use a valid image URN, custom image name, custom image id, VHD blob URI, or pick an image from ['CentOS85Gen2', 'Debian11', 'OpenSuseLeap154Gen2', 'RHELRaw8LVMGen2', 'SuseSles15SP5', 'Ubuntu2204', 'Ubuntu2404', 'Ubuntu2404Pro', 'FlatcarLinuxFreeGen2', 'Win2022Datacenter', 'Win2022AzureEditionCore', 'Win2019Datacenter', 'Win2016Datacenter', 'Win2012R2Datacenter', 'Win2012Datacenter'].
+See vm create -h for more information on specifying an image.
+azureuser [ ~ ]$ --image Ubuntu2204
+bash: --image: command not found
+azureuser [ ~ ]$ az vm create \
+  --resource-group MyResourceGroup \
+  --name MyVM \
+  --nics MyNIC \
+  --image Ubuntu2204 \
+  --admin-username azureuser \
+  --generate-ssh-keys
+SSH key files '/home/azureuser/.ssh/id_rsa' and '/home/azureuser/.ssh/id_rsa.pub' have been generated under ~/.ssh to allow SSH access to the VM. If using machines without permanent storage, back up your keys to a safe location.
+{"error":{"code":"InvalidTemplateDeployment","message":"The template deployment 'vm_deploy_k8axB15VCZASaWkZQ9rmKh9A6uUQZpcN' is not valid according to the validation procedure. The tracking id is 'cf5c6be3-7197-4247-9dc8-bc11dec2b4b6'. See inner errors for details.","details":[{"code":"SkuNotAvailable","message":"The requested VM size for resource 'Following SKUs have failed for Capacity Restrictions: Standard_DS1_v2' is currently not available in location 'eastus'. Please try another size or deploy to a different location or different zone. See https://aka.ms/azureskunotavailable for details."}]}}
+azureuser [ ~ ]$ az vm create \
+  --resource-group MyResourceGroup \
+  --name MyVM \
+  --nics MyNIC \
+  --image Ubuntu2204 \
+  --admin-username azureuser \
+  --generate-ssh-keys \
+  --size Standard_B1s
+{
+  "fqdns": "",
+  "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroup/providers/Microsoft.Compute/virtualMachines/MyVM",
+  "location": "eastus",
+  "macAddress": "7C-1E-52-48-27-9F",
+  "powerState": "VM running",
+  "privateIpAddress": "10.0.1.4",
+  "publicIpAddress": "172.178.36.203",
+  "resourceGroup": "MyResourceGroup",
+  "zones": ""
+}
+azureuser [ ~ ]$ az group create \
+  --name MyResourceGroup \
+  --location westus
+(InvalidResourceGroupLocation) Invalid resource group location 'westus'. The Resource group already exists in location 'eastus'.
+Code: InvalidResourceGroupLocation
+Message: Invalid resource group location 'westus'. The Resource group already exists in location 'eastus'.
+azureuser [ ~ ]$ az group create --name MyResourceGroup --location westus
+(InvalidResourceGroupLocation) Invalid resource group location 'westus'. The Resource group already exists in location 'eastus'.
+Code: InvalidResourceGroupLocation
+Message: Invalid resource group location 'westus'. The Resource group already exists in location 'eastus'.
+azureuser [ ~ ]$ az group create \
+  --name MyResourceGroupWest \
+  --location westus
+{
+  "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest",
+  "location": "westus",
+  "managedBy": null,
+  "name": "MyResourceGroupWest",
+  "properties": {
+    "provisioningState": "Succeeded"
+  },
+  "tags": null,
+  "type": "Microsoft.Resources/resourceGroups"
+}
+azureuser [ ~ ]$ RESOURCE_GROUP="MyResourceGroupWest"
+LOCATION="westus"
+VNET_NAME="MyVNetWest"
+SUBNET_NAME="MySubnetWest"
+NSG_NAME="MyNSGWest"
+PUBLIC_IP_NAME="MyPublicIPWest"
+NIC_NAME="MyNICWest"
+VM_NAME="MyVMWest"
+ADMIN_USERNAME="azureuser"
+VM_SIZE="Standard_B1s"
+IMAGE="Ubuntu2204"
+azureuser [ ~ ]$ az network vnet create \
+  --resource-group $RESOURCE_GROUP \
+  --name $VNET_NAME \
+  --address-prefix 10.1.0.0/16 \
+  --subnet-name $SUBNET_NAME \
+  --subnet-prefix 10.1.1.0/24
+{
+  "newVNet": {
+    "addressSpace": {
+      "addressPrefixes": [
+        "10.1.0.0/16"
+      ]
+    },
+    "enableDdosProtection": false,
+    "etag": "W/\"624d2a45-3325-4919-8b3b-4b9b969cb3be\"",
+    "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/virtualNetworks/MyVNetWest",
+    "location": "westus",
+    "name": "MyVNetWest",
+    "privateEndpointVNetPolicies": "Disabled",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "MyResourceGroupWest",
+    "resourceGuid": "21ccb718-34cc-4fda-9eb2-5a2c1ebdbeed",
+    "subnets": [
+      {
+        "addressPrefix": "10.1.1.0/24",
+        "delegations": [],
+        "etag": "W/\"624d2a45-3325-4919-8b3b-4b9b969cb3be\"",
+        "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/virtualNetworks/MyVNetWest/subnets/MySubnetWest",
+        "name": "MySubnetWest",
+        "privateEndpointNetworkPolicies": "Disabled",
+        "privateLinkServiceNetworkPolicies": "Enabled",
+        "provisioningState": "Succeeded",
+        "resourceGroup": "MyResourceGroupWest",
+        "type": "Microsoft.Network/virtualNetworks/subnets"
+      }
+    ],
+    "type": "Microsoft.Network/virtualNetworks",
+    "virtualNetworkPeerings": []
+  }
+}
+azureuser [ ~ ]$ az network nsg create \
+  --resource-group $RESOURCE_GROUP \
+  --name $NSG_NAME
+{
+  "NewNSG": {
+    "defaultSecurityRules": [
+      {
+        "access": "Allow",
+        "description": "Allow inbound traffic from all VMs in VNET",
+        "destinationAddressPrefix": "VirtualNetwork",
+        "destinationAddressPrefixes": [],
+        "destinationPortRange": "*",
+        "destinationPortRanges": [],
+        "direction": "Inbound",
+        "etag": "W/\"02fb534f-8704-4c06-93c3-d8ef0160e6b3\"",
+        "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest/defaultSecurityRules/AllowVnetInBound",
+        "name": "AllowVnetInBound",
+        "priority": 65000,
+        "protocol": "*",
+        "provisioningState": "Succeeded",
+        "resourceGroup": "MyResourceGroupWest",
+        "sourceAddressPrefix": "VirtualNetwork",
+        "sourceAddressPrefixes": [],
+        "sourcePortRange": "*",
+        "sourcePortRanges": [],
+        "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+      },
+      {
+        "access": "Allow",
+        "description": "Allow inbound traffic from azure load balancer",
+        "destinationAddressPrefix": "*",
+        "destinationAddressPrefixes": [],
+        "destinationPortRange": "*",
+        "destinationPortRanges": [],
+        "direction": "Inbound",
+        "etag": "W/\"02fb534f-8704-4c06-93c3-d8ef0160e6b3\"",
+        "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest/defaultSecurityRules/AllowAzureLoadBalancerInBound",
+        "name": "AllowAzureLoadBalancerInBound",
+        "priority": 65001,
+        "protocol": "*",
+        "provisioningState": "Succeeded",
+        "resourceGroup": "MyResourceGroupWest",
+        "sourceAddressPrefix": "AzureLoadBalancer",
+        "sourceAddressPrefixes": [],
+        "sourcePortRange": "*",
+        "sourcePortRanges": [],
+        "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+      },
+      {
+        "access": "Deny",
+        "description": "Deny all inbound traffic",
+        "destinationAddressPrefix": "*",
+        "destinationAddressPrefixes": [],
+        "destinationPortRange": "*",
+        "destinationPortRanges": [],
+        "direction": "Inbound",
+        "etag": "W/\"02fb534f-8704-4c06-93c3-d8ef0160e6b3\"",
+        "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest/defaultSecurityRules/DenyAllInBound",
+        "name": "DenyAllInBound",
+        "priority": 65500,
+        "protocol": "*",
+        "provisioningState": "Succeeded",
+        "resourceGroup": "MyResourceGroupWest",
+        "sourceAddressPrefix": "*",
+        "sourceAddressPrefixes": [],
+        "sourcePortRange": "*",
+        "sourcePortRanges": [],
+        "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+      },
+      {
+        "access": "Allow",
+        "description": "Allow outbound traffic from all VMs to all VMs in VNET",
+        "destinationAddressPrefix": "VirtualNetwork",
+        "destinationAddressPrefixes": [],
+        "destinationPortRange": "*",
+        "destinationPortRanges": [],
+        "direction": "Outbound",
+        "etag": "W/\"02fb534f-8704-4c06-93c3-d8ef0160e6b3\"",
+        "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest/defaultSecurityRules/AllowVnetOutBound",
+        "name": "AllowVnetOutBound",
+        "priority": 65000,
+        "protocol": "*",
+        "provisioningState": "Succeeded",
+        "resourceGroup": "MyResourceGroupWest",
+        "sourceAddressPrefix": "VirtualNetwork",
+        "sourceAddressPrefixes": [],
+        "sourcePortRange": "*",
+        "sourcePortRanges": [],
+        "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+      },
+      {
+        "access": "Allow",
+        "description": "Allow outbound traffic from all VMs to Internet",
+        "destinationAddressPrefix": "Internet",
+        "destinationAddressPrefixes": [],
+        "destinationPortRange": "*",
+        "destinationPortRanges": [],
+        "direction": "Outbound",
+        "etag": "W/\"02fb534f-8704-4c06-93c3-d8ef0160e6b3\"",
+        "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest/defaultSecurityRules/AllowInternetOutBound",
+        "name": "AllowInternetOutBound",
+        "priority": 65001,
+        "protocol": "*",
+        "provisioningState": "Succeeded",
+        "resourceGroup": "MyResourceGroupWest",
+        "sourceAddressPrefix": "*",
+        "sourceAddressPrefixes": [],
+        "sourcePortRange": "*",
+        "sourcePortRanges": [],
+        "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+      },
+      {
+        "access": "Deny",
+        "description": "Deny all outbound traffic",
+        "destinationAddressPrefix": "*",
+        "destinationAddressPrefixes": [],
+        "destinationPortRange": "*",
+        "destinationPortRanges": [],
+        "direction": "Outbound",
+        "etag": "W/\"02fb534f-8704-4c06-93c3-d8ef0160e6b3\"",
+        "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest/defaultSecurityRules/DenyAllOutBound",
+        "name": "DenyAllOutBound",
+        "priority": 65500,
+        "protocol": "*",
+        "provisioningState": "Succeeded",
+        "resourceGroup": "MyResourceGroupWest",
+        "sourceAddressPrefix": "*",
+        "sourceAddressPrefixes": [],
+        "sourcePortRange": "*",
+        "sourcePortRanges": [],
+        "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+      }
+    ],
+    "etag": "W/\"02fb534f-8704-4c06-93c3-d8ef0160e6b3\"",
+    "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest",
+    "location": "westus",
+    "name": "MyNSGWest",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "MyResourceGroupWest",
+    "resourceGuid": "d56a47e4-0f25-417d-b26a-0238f8587a2b",
+    "securityRules": [],
+    "type": "Microsoft.Network/networkSecurityGroups"
+  }
+}
+azureuser [ ~ ]$ az network nsg rule create \
+  --resource-group $RESOURCE_GROUP \
+  --nsg-name $NSG_NAME \
+  --name AllowSSH \
+  --protocol Tcp \
+  --direction Inbound \
+  --priority 1000 \
+  --source-address-prefixes '*' \
+  --source-port-ranges '*' \
+  --destination-address-prefixes '*' \
+  --destination-port-ranges 22 \
+  --access Allow
+{
+  "access": "Allow",
+  "destinationAddressPrefix": "*",
+  "destinationAddressPrefixes": [],
+  "destinationPortRange": "22",
+  "destinationPortRanges": [],
+  "direction": "Inbound",
+  "etag": "W/\"fa15c4bc-bff5-4cce-8313-df26ef2f78cc\"",
+  "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest/securityRules/AllowSSH",
+  "name": "AllowSSH",
+  "priority": 1000,
+  "protocol": "Tcp",
+  "provisioningState": "Succeeded",
+  "resourceGroup": "MyResourceGroupWest",
+  "sourceAddressPrefix": "*",
+  "sourceAddressPrefixes": [],
+  "sourcePortRange": "*",
+  "sourcePortRanges": [],
+  "type": "Microsoft.Network/networkSecurityGroups/securityRules"
+}
+azureuser [ ~ ]$ az network public-ip create \
+  --resource-group $RESOURCE_GROUP \
+  --name $PUBLIC_IP_NAME
+[Coming breaking change] In the coming release, the default behavior will be changed as follows when sku is Standard and zone is not provided: For zonal regions, you will get a zone-redundant IP indicated by zones:["1","2","3"]; For non-zonal regions, you will get a non zone-redundant IP indicated by zones:null.
+{
+  "publicIp": {
+    "ddosSettings": {
+      "protectionMode": "VirtualNetworkInherited"
+    },
+    "etag": "W/\"800adbab-a671-4512-91af-2227b3da8148\"",
+    "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/publicIPAddresses/MyPublicIPWest",
+    "idleTimeoutInMinutes": 4,
+    "ipAddress": "172.184.130.117",
+    "ipTags": [],
+    "location": "westus",
+    "name": "MyPublicIPWest",
+    "provisioningState": "Succeeded",
+    "publicIPAddressVersion": "IPv4",
+    "publicIPAllocationMethod": "Static",
+    "resourceGroup": "MyResourceGroupWest",
+    "resourceGuid": "5704be88-db04-4b2d-9b73-98b771ba1b19",
+    "sku": {
+      "name": "Standard",
+      "tier": "Regional"
+    },
+    "type": "Microsoft.Network/publicIPAddresses"
+  }
+}
+azureuser [ ~ ]$ az network nic create \
+  --resource-group $RESOURCE_GROUP \
+  --name $NIC_NAME \
+  --vnet-name $VNET_NAME \
+  --subnet $SUBNET_NAME \
+  --network-security-group $NSG_NAME \
+  --public-ip-address $PUBLIC_IP_NAME\
+> ^C
+azureuser [ ~ ]$ az network nic create \
+  --resource-group $RESOURCE_GROUP \
+  --name $NIC_NAME \
+  --vnet-name $VNET_NAME \
+  --subnet $SUBNET_NAME \
+  --network-security-group $NSG_NAME \
+  --public-ip-address $PUBLIC_IP_NAME
+{
+  "NewNIC": {
+    "auxiliaryMode": "None",
+    "auxiliarySku": "None",
+    "disableTcpStateTracking": false,
+    "dnsSettings": {
+      "appliedDnsServers": [],
+      "dnsServers": [],
+      "internalDomainNameSuffix": "dc12yiomgtne5hvsliwb3pn43f.dx.internal.cloudapp.net"
+    },
+    "enableIPForwarding": false,
+    "etag": "W/\"480b360b-53fd-4879-b478-3711ee861d97\"",
+    "hostedWorkloads": [],
+    "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkInterfaces/MyNICWest",
+    "ipConfigurations": [
+      {
+        "etag": "W/\"480b360b-53fd-4879-b478-3711ee861d97\"",
+        "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkInterfaces/MyNICWest/ipConfigurations/ipconfig1",
+        "name": "ipconfig1",
+        "primary": true,
+        "privateIPAddress": "10.1.1.4",
+        "privateIPAddressVersion": "IPv4",
+        "privateIPAllocationMethod": "Dynamic",
+        "provisioningState": "Succeeded",
+        "publicIPAddress": {
+          "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/publicIPAddresses/MyPublicIPWest",
+          "resourceGroup": "MyResourceGroupWest"
+        },
+        "resourceGroup": "MyResourceGroupWest",
+        "subnet": {
+          "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/virtualNetworks/MyVNetWest/subnets/MySubnetWest",
+          "resourceGroup": "MyResourceGroupWest"
+        },
+        "type": "Microsoft.Network/networkInterfaces/ipConfigurations"
+      }
+    ],
+    "location": "westus",
+    "name": "MyNICWest",
+    "networkSecurityGroup": {
+      "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest",
+      "resourceGroup": "MyResourceGroupWest"
+    },
+    "nicType": "Standard",
+    "provisioningState": "Succeeded",
+    "resourceGroup": "MyResourceGroupWest",
+    "resourceGuid": "effdcfda-9a00-40e2-9c20-ebccba5b85f1",
+    "tapConfigurations": [],
+    "type": "Microsoft.Network/networkInterfaces",
+    "vnetEncryptionSupported": false
+  }
+}
+azureuser [ ~ ]$ az vm create \
+  --resource-group $RESOURCE_GROUP \
+  --name $VM_NAME \
+  --nics $NIC_NAME \
+  --image $IMAGE \
+  --admin-username $ADMIN_USERNAME \
+  --generate-ssh-keys \
+  --size $VM_SIZE
+{
+  "fqdns": "",
+  "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Compute/virtualMachines/MyVMWest",
+  "location": "westus",
+  "macAddress": "60-45-BD-08-66-3B",
+  "powerState": "VM running",
+  "privateIpAddress": "10.1.1.4",
+  "publicIpAddress": "172.184.130.117",
+  "resourceGroup": "MyResourceGroupWest",
+  "zones": ""
+}
+azureuser [ ~ ]$ az vm open-port \
+  --resource-group $RESOURCE_GROUP \
+  --name $VM_NAME \
+  --port 22
+{
+  "defaultSecurityRules": [
+    {
+      "access": "Allow",
+      "description": "Allow inbound traffic from all VMs in VNET",
+      "destinationAddressPrefix": "VirtualNetwork",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"59c8e6da-56df-4e0b-bf61-38264e9d6e3b\"",
+      "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest/defaultSecurityRules/AllowVnetInBound",
+      "name": "AllowVnetInBound",
+      "priority": 65000,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "MyResourceGroupWest",
+      "sourceAddressPrefix": "VirtualNetwork",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Allow",
+      "description": "Allow inbound traffic from azure load balancer",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"59c8e6da-56df-4e0b-bf61-38264e9d6e3b\"",
+      "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest/defaultSecurityRules/AllowAzureLoadBalancerInBound",
+      "name": "AllowAzureLoadBalancerInBound",
+      "priority": 65001,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "MyResourceGroupWest",
+      "sourceAddressPrefix": "AzureLoadBalancer",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Deny",
+      "description": "Deny all inbound traffic",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"59c8e6da-56df-4e0b-bf61-38264e9d6e3b\"",
+      "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest/defaultSecurityRules/DenyAllInBound",
+      "name": "DenyAllInBound",
+      "priority": 65500,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "MyResourceGroupWest",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Allow",
+      "description": "Allow outbound traffic from all VMs to all VMs in VNET",
+      "destinationAddressPrefix": "VirtualNetwork",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Outbound",
+      "etag": "W/\"59c8e6da-56df-4e0b-bf61-38264e9d6e3b\"",
+      "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest/defaultSecurityRules/AllowVnetOutBound",
+      "name": "AllowVnetOutBound",
+      "priority": 65000,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "MyResourceGroupWest",
+      "sourceAddressPrefix": "VirtualNetwork",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Allow",
+      "description": "Allow outbound traffic from all VMs to Internet",
+      "destinationAddressPrefix": "Internet",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Outbound",
+      "etag": "W/\"59c8e6da-56df-4e0b-bf61-38264e9d6e3b\"",
+      "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest/defaultSecurityRules/AllowInternetOutBound",
+      "name": "AllowInternetOutBound",
+      "priority": 65001,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "MyResourceGroupWest",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    },
+    {
+      "access": "Deny",
+      "description": "Deny all outbound traffic",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "*",
+      "destinationPortRanges": [],
+      "direction": "Outbound",
+      "etag": "W/\"59c8e6da-56df-4e0b-bf61-38264e9d6e3b\"",
+      "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest/defaultSecurityRules/DenyAllOutBound",
+      "name": "DenyAllOutBound",
+      "priority": 65500,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "MyResourceGroupWest",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+    }
+  ],
+  "etag": "W/\"59c8e6da-56df-4e0b-bf61-38264e9d6e3b\"",
+  "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest",
+  "location": "westus",
+  "name": "MyNSGWest",
+  "networkInterfaces": [
+    {
+      "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkInterfaces/MyNICWest",
+      "resourceGroup": "MyResourceGroupWest"
+    }
+  ],
+  "provisioningState": "Succeeded",
+  "resourceGroup": "MyResourceGroupWest",
+  "resourceGuid": "d56a47e4-0f25-417d-b26a-0238f8587a2b",
+  "securityRules": [
+    {
+      "access": "Allow",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "22",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"59c8e6da-56df-4e0b-bf61-38264e9d6e3b\"",
+      "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest/securityRules/AllowSSH",
+      "name": "AllowSSH",
+      "priority": 1000,
+      "protocol": "Tcp",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "MyResourceGroupWest",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/securityRules"
+    },
+    {
+      "access": "Allow",
+      "destinationAddressPrefix": "*",
+      "destinationAddressPrefixes": [],
+      "destinationPortRange": "22",
+      "destinationPortRanges": [],
+      "direction": "Inbound",
+      "etag": "W/\"59c8e6da-56df-4e0b-bf61-38264e9d6e3b\"",
+      "id": "/subscriptions/78b45807-4c0f-42c8-a888-49751e831f0a/resourceGroups/MyResourceGroupWest/providers/Microsoft.Network/networkSecurityGroups/MyNSGWest/securityRules/open-port-22",
+      "name": "open-port-22",
+      "priority": 900,
+      "protocol": "*",
+      "provisioningState": "Succeeded",
+      "resourceGroup": "MyResourceGroupWest",
+      "sourceAddressPrefix": "*",
+      "sourceAddressPrefixes": [],
+      "sourcePortRange": "*",
+      "sourcePortRanges": [],
+      "type": "Microsoft.Network/networkSecurityGroups/securityRules"
+    }
+  ],
+  "type": "Microsoft.Network/networkSecurityGroups"
+}
+azureuser [ ~ ]$ az vm show \
+  --resource-group $RESOURCE_GROUP \
+  --name $VM_NAME \
+  --show-details \
+  --query publicIps \
+  --output tsv
+172.184.130.117
+azureuser [ ~ ]$ ssh azureuser@172.184.130.117
+The authenticity of host '172.184.130.117 (172.184.130.117)' can't be established.
+ED25519 key fingerprint is SHA256:fgczSSrZGefmp2hGYTHKLzDNMoGsR19yNV5Ep49Fr8U.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '172.184.130.117' (ED25519) to the list of known hosts.
+Welcome to Ubuntu 22.04.5 LTS (GNU/Linux 6.8.0-1029-azure x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Sun Jun 22 14:03:27 UTC 2025
+
+  System load:  0.12              Processes:             107
+  Usage of /:   5.3% of 28.89GB   Users logged in:       0
+  Memory usage: 30%               IPv4 address for eth0: 10.1.1.4
+  Swap usage:   0%
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
