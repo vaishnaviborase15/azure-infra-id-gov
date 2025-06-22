@@ -43,8 +43,7 @@ Create a custom or built-in Azure Policy and assign it at the **Subscription lev
 - **Description**: "Allows resource creation only in East US."
 - **Category**: Create or select one.
 - **Policy Rule**:
-
-```json
+  ```json
 {
   "if": {
     "field": "location",
@@ -57,6 +56,7 @@ Create a custom or built-in Azure Policy and assign it at the **Subscription lev
 Click Save.
 
 
+  
 
 ### Step 5: Assign the Policy
 ➤ Navigate to Assignments
