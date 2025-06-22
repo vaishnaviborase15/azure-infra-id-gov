@@ -52,7 +52,8 @@ Create a custom or built-in Azure Policy and assign it at the **Subscription lev
   "then": {
     "effect": "deny"
   }
-}
+  }
+
 
 Click Save.
 
