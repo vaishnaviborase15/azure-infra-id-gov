@@ -44,7 +44,7 @@ Create a custom or built-in Azure Policy and assign it at the **Subscription lev
 - **Category**: Create or select one.
 - **Policy Rule**:
   ```json
-{
+  {
   "if": {
     "field": "location",
     "notEquals": "eastus"
@@ -53,6 +53,7 @@ Create a custom or built-in Azure Policy and assign it at the **Subscription lev
     "effect": "deny"
   }
 }
+
 Click Save.
 
 
@@ -78,10 +79,12 @@ If using a parameterized policy (e.g., allowed regions, tags), set the required 
 
 Click Next → Next → Review + Create → Create
 
-Result:
+
+## Result:
 The policy is now active and assigned at the subscription level. It enforces rules on all resource deployments under that subscription.
 
-Notes:
+
+## Notes:
 You can monitor policy compliance from the Compliance tab under Policy.
 
 Policy effects include: Deny, Audit, Append, DeployIfNotExists, etc.
