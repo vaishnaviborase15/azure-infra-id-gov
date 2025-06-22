@@ -20,7 +20,7 @@ This guide provides step-by-step instructions to:
 - Set your subscription (if required):
 
 ```bash
-az account set --subscription "<Your-Subscription-Name>"
+az account set --subscription "Azure Student Subscription"
 ```
 
 ---
