@@ -56,30 +56,4 @@ Create a custom or built-in Azure Policy and assign it at the **Subscription lev
 }
 Click Save.
 
-### Step 5: Assign the Policy
-➤ Navigate to Assignments
-Go back to the Policy dashboard.
 
-Click on “Assignments”.
-
-Click on “+ Assign Policy”.
-
-➤ Fill the Assignment Details:
-Scope: Select the subscription.
-
-Policy Definition: Choose either a built-in policy or the custom one you just created.
-
-Assignment Name: e.g., Restrict to East US
-
-➤ (Optional) Configure Parameters:
-If using a parameterized policy (e.g., allowed regions, tags), set the required values.
-
-Click Next → Next → Review + Create → Create
-
-Result:
-The policy is now active and assigned at the subscription level. It enforces rules on all resource deployments under that subscription.
-
-Notes:
-You can monitor policy compliance from the Compliance tab under Policy.
-
-Policy effects include: Deny, Audit, Append, DeployIfNotExists, etc.
